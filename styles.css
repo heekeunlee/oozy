@@ -165,7 +165,13 @@ input[type="range"] {
 #map {
   width: 100%;
   height: 100%;
-  background: #eaf3ec;
+  background: #f3f3f1;
+  filter: saturate(0) contrast(1.04) brightness(1.03);
+}
+
+.leaflet-overlay-pane svg path {
+  paint-order: stroke fill;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.28));
 }
 
 .first-marker {
@@ -173,13 +179,13 @@ input[type="range"] {
   place-items: center;
   width: 30px;
   height: 30px;
-  border: 3px solid #fff;
+  border: 3px solid #102416;
   border-radius: 50%;
   background: var(--yellow);
   color: #442f00;
   font-size: 12px;
   font-weight: 900;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.24);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28), 0 0 0 3px #fff;
 }
 
 .growth-chart {

@@ -65,11 +65,12 @@ function storesForYear(year) {
 function markerStyle(store) {
   const recent = store.newestRank <= 12;
   return {
-    radius: recent ? 7 : 4,
-    color: "#ffffff",
-    weight: recent ? 2 : 1,
+    radius: recent ? 8 : 5,
+    color: "#0b2414",
+    weight: recent ? 2.5 : 1.4,
     fillColor: regionColors[store.region] || regionColors["기타"],
-    fillOpacity: recent ? 0.95 : 0.72,
+    fillOpacity: recent ? 1 : 0.9,
+    opacity: 0.95,
   };
 }
 
@@ -206,9 +207,9 @@ async function init() {
   }).setView([36.45, 127.85], 6.6);
 
   L.control.zoom({ position: "bottomright" }).addTo(state.map);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png", {
     maxZoom: 18,
-    attribution: "&copy; OpenStreetMap",
+    attribution: "&copy; OpenStreetMap &copy; CARTO",
   }).addTo(state.map);
 
   state.layer = L.layerGroup().addTo(state.map);
