@@ -128,6 +128,31 @@ button {
   padding: 8px 12px;
 }
 
+.view-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f0f4ef;
+}
+
+.view-toggle button {
+  min-width: 0;
+  border-color: transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #58635b;
+}
+
+.view-toggle button.active {
+  background: var(--green);
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(15, 107, 61, 0.22);
+}
+
 .source-chip {
   flex: 0 0 auto;
   padding: 7px 10px;
@@ -142,7 +167,7 @@ input[type="range"] {
 
 .timeline {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(38px, 1fr));
   gap: 4px;
   color: var(--muted);
   font-size: 11px;
@@ -150,6 +175,24 @@ input[type="range"] {
 
 .timeline span {
   text-align: center;
+}
+
+.gradient-legend {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.gradient-legend i {
+  display: block;
+  height: 9px;
+  border: 1px solid #bdc9bf;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #d2eedb, #75bc8b, #05562c);
 }
 
 .map-shell {
@@ -166,6 +209,9 @@ input[type="range"] {
   width: 100%;
   height: 100%;
   background: #f3f3f1;
+}
+
+.leaflet-tile-pane {
   filter: saturate(0) contrast(1.04) brightness(1.03);
 }
 
@@ -181,8 +227,8 @@ input[type="range"] {
   height: 30px;
   border: 3px solid #102416;
   border-radius: 50%;
-  background: var(--yellow);
-  color: #442f00;
+  background: var(--green);
+  color: #fff;
   font-size: 12px;
   font-weight: 900;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28), 0 0 0 3px #fff;
@@ -269,6 +315,22 @@ input[type="range"] {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.45;
+}
+
+.store-tooltip {
+  border: 1px solid rgba(10, 44, 23, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #102416;
+  box-shadow: 0 8px 18px rgba(12, 34, 18, 0.2);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0;
+  padding: 6px 9px;
+}
+
+.store-tooltip::before {
+  display: none;
 }
 
 @media (min-width: 760px) {

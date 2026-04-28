@@ -23,7 +23,7 @@
         </div>
         <div>
           <span id="current-total">447</span>
-          <small>현재 공식 목록</small>
+          <small id="current-total-label">현재 공식 목록</small>
         </div>
         <div>
           <span id="region-count">0</span>
@@ -39,8 +39,17 @@
           </div>
           <button id="play-button" type="button">재생</button>
         </div>
-        <input id="year-range" type="range" min="2020" max="2026" step="1" value="2026">
+        <div class="view-toggle" aria-label="지도 보기 범위">
+          <button class="active" type="button" data-view="all">남한 전체</button>
+          <button type="button" data-view="gyeonggi">경기도</button>
+        </div>
+        <input id="year-range" type="range" min="2019" max="2026" step="1" value="2026">
         <div id="timeline" class="timeline"></div>
+        <div class="gradient-legend" aria-label="매장 순번 색상 범례">
+          <span>초기</span>
+          <i></i>
+          <span>최근</span>
+        </div>
       </section>
 
       <section class="map-shell">

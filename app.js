@@ -1,4 +1,5 @@
 const milestones = [
+  { year: 2019, count: 1, label: "석촌호수1호점", source: "공식 보도자료" },
   { year: 2020, count: 1, label: "가맹본부 설립", source: "공식 보도자료" },
   { year: 2021, count: 4, label: "가맹점 4개", source: "정보공개서" },
   { year: 2022, count: 18, label: "가맹점 18개", source: "정보공개서" },
@@ -23,27 +24,7 @@ const state = {
   layer: null,
   firstLayer: null,
   timer: null,
-};
-
-const regionColors = {
-  서울: "#0f6b3d",
-  경기: "#2d8f67",
-  인천: "#2079a8",
-  부산: "#d5533c",
-  대구: "#bb6b1e",
-  광주: "#7a5ab8",
-  대전: "#91692e",
-  울산: "#338c8a",
-  세종: "#b1457b",
-  강원: "#4d81cf",
-  충북: "#77a22f",
-  충남: "#d09a2b",
-  전북: "#8f7a35",
-  전남: "#2e9f91",
-  경북: "#9f5f45",
-  경남: "#517c2f",
-  제주: "#e17a44",
-  기타: "#68746a",
+  view: "all",
 };
 
 function milestoneForYear(year) {
@@ -59,7 +40,24 @@ function estimateYear(order) {
 
 function storesForYear(year) {
   const target = milestoneForYear(year).count;
+  if (Number(year) <= 2020) return [];
   return state.stores.filter((store) => store.openOrderEstimate <= target);
+}
+
+function storesForCurrentView() {
+  const visible = storesForYear(state.year);
+  if (state.view === "gyeonggi") {
+    return visible.filter((store) => store.region === "경기");
+  }
+  return visible;
+}
+
+function greenGradient(store) {
+  const ratio = (store.openOrderEstimate - 1) / Math.max(1, state.stores.length - 1);
+  const start = [210, 238, 219];
+  const end = [5, 86, 44];
+  const rgb = start.map((value, index) => Math.round(value + (end[index] - value) * ratio));
+  return `rgb(${rgb.join(", ")})`;
 }
 
 function markerStyle(store) {
@@ -68,35 +66,72 @@ function markerStyle(store) {
     radius: recent ? 8 : 5,
     color: "#0b2414",
     weight: recent ? 2.5 : 1.4,
-    fillColor: regionColors[store.region] || regionColors["기타"],
+    fillColor: greenGradient(store),
     fillOpacity: recent ? 1 : 0.9,
     opacity: 0.95,
   };
 }
 
-function popupHtml(store) {
-  return `
-    <span class="popup-title">${store.name}</span>
-    <span class="popup-meta">
-      추정 ${store.estimatedYear}년 등록 · ${store.region}<br>
-      ${store.address}<br>
-      ${store.phone || "전화번호 미공개"}
-    </span>
-  `;
+function tooltipLabel(store) {
+  const shortName = store.name.replace(/^우지커피\s*/, "");
+  return `${shortName} ${store.openOrderEstimate}호점`;
+}
+
+function focusMap(visible) {
+  if (state.view === "gyeonggi") {
+    const bounds = visible.length
+      ? L.latLngBounds(visible.map((store) => [store.lat, store.lng]))
+      : L.latLngBounds([[36.85, 126.55], [38.25, 127.85]]);
+    state.map.fitBounds(bounds, { padding: [24, 24], maxZoom: 9.5, animate: true });
+    return;
+  }
+
+  state.map.setView([36.45, 127.85], 6.6, { animate: true });
 }
 
 function renderMap() {
-  const visible = storesForYear(state.year);
+  const visible = storesForCurrentView();
+  const firstVisible = state.view === "all" && state.year >= 2019;
   state.layer.clearLayers();
+  if (!firstVisible) {
+    state.map.removeLayer(state.firstLayer);
+  } else if (!state.map.hasLayer(state.firstLayer)) {
+    state.firstLayer.addTo(state.map);
+  }
+
   visible.forEach((store) => {
-    L.circleMarker([store.lat, store.lng], markerStyle(store))
-      .bindPopup(popupHtml(store))
+    const marker = L.circleMarker([store.lat, store.lng], markerStyle(store))
+      .bindTooltip(tooltipLabel(store), {
+        className: "store-tooltip",
+        direction: "top",
+        opacity: 1,
+        sticky: true,
+      })
       .addTo(state.layer);
+
+    marker.on("mouseover", () => {
+      marker.setStyle({
+        radius: (markerStyle(store).radius || 5) + 3,
+        fillOpacity: 1,
+        weight: 3,
+      });
+      marker.bringToFront();
+    });
+    marker.on("mouseout", () => {
+      marker.setStyle(markerStyle(store));
+    });
   });
 
-  document.querySelector("#visible-count").textContent = visible.length.toLocaleString("ko-KR");
-  document.querySelector("#region-count").textContent = new Set(visible.map((store) => store.region)).size;
+  const visibleCount = visible.length + (firstVisible ? 1 : 0);
+  const scopedTotal = state.view === "gyeonggi"
+    ? state.stores.filter((store) => store.region === "경기").length
+    : state.stores.length;
+  document.querySelector("#visible-count").textContent = visibleCount.toLocaleString("ko-KR");
+  document.querySelector("#current-total").textContent = scopedTotal.toLocaleString("ko-KR");
+  document.querySelector("#current-total-label").textContent = state.view === "gyeonggi" ? "경기도 공식 목록" : "현재 공식 목록";
+  document.querySelector("#region-count").textContent = new Set(visible.map((store) => store.region)).size + (firstVisible && !visible.some((store) => store.region === "서울") ? 1 : 0);
   document.querySelector("#year-label").textContent = state.year;
+  focusMap(visible);
   renderStoreList(visible);
 }
 
@@ -135,7 +170,10 @@ function renderStoreList(visible) {
       <span>${firstStore.address} · 공식 보도자료 기준</span>
     </article>
   `;
-  const latest = [...state.stores]
+  const scopedStores = state.view === "gyeonggi"
+    ? state.stores.filter((store) => store.region === "경기")
+    : state.stores;
+  const latest = [...scopedStores]
     .sort((a, b) => a.newestRank - b.newestRank)
     .slice(0, 6)
     .map((store) => `
@@ -159,6 +197,7 @@ function renderStoreList(visible) {
 function initControls() {
   const range = document.querySelector("#year-range");
   const play = document.querySelector("#play-button");
+  const viewButtons = document.querySelectorAll("[data-view]");
 
   range.addEventListener("input", (event) => {
     state.year = Number(event.target.value);
@@ -174,7 +213,7 @@ function initControls() {
     }
 
     play.textContent = "정지";
-    state.year = 2020;
+    state.year = 2019;
     range.value = state.year;
     renderMap();
     state.timer = setInterval(() => {
@@ -188,6 +227,14 @@ function initControls() {
       range.value = state.year;
       renderMap();
     }, 950);
+  });
+
+  viewButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      state.view = button.dataset.view;
+      viewButtons.forEach((item) => item.classList.toggle("active", item === button));
+      renderMap();
+    });
   });
 }
 
@@ -220,11 +267,13 @@ async function init() {
       iconSize: [30, 30],
       iconAnchor: [15, 15],
     }),
-  })
-    .bindPopup(`
-      <span class="popup-title">${firstStore.name}</span>
-      <span class="popup-meta">2019년 8월 송파구에 개설된 브랜드 1호점입니다.</span>
-    `)
+    })
+    .bindTooltip("석촌호수 1호점", {
+      className: "store-tooltip first-tooltip",
+      direction: "top",
+      opacity: 1,
+      sticky: true,
+    })
     .addTo(state.map);
 
   renderTimeline();
