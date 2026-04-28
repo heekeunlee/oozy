@@ -19,6 +19,13 @@ const firstStore = {
   region: "서울",
 };
 
+const averageSalesByYear = {
+  2021: 21449,
+  2022: 22902,
+  2023: 23714,
+  2024: 21304,
+};
+
 const state = {
   stores: [],
   year: 2026,
@@ -44,10 +51,23 @@ function storesForYear(year) {
   return state.stores.filter((store) => store.openOrderEstimate <= target);
 }
 
-function greenGradient(store) {
-  const ratio = (store.openOrderEstimate - 1) / Math.max(1, state.stores.length - 1);
-  const start = [210, 238, 219];
-  const end = [5, 86, 44];
+function salesMetric(store) {
+  if (store.name === firstStore.name) return averageSalesByYear[2021];
+  const disclosedYear = Math.min(Math.max(store.estimatedYear, 2021), 2024);
+  return averageSalesByYear[disclosedYear];
+}
+
+function salesRatio(store) {
+  const values = Object.values(averageSalesByYear);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  return (salesMetric(store) - min) / (max - min);
+}
+
+function salesGreen(store) {
+  const ratio = salesRatio(store);
+  const start = [181, 224, 193];
+  const end = [2, 78, 39];
   const rgb = start.map((value, index) => Math.round(value + (end[index] - value) * ratio));
   return `rgb(${rgb.join(", ")})`;
 }
@@ -55,12 +75,13 @@ function greenGradient(store) {
 function markerStyle(store) {
   const recent = store.newestRank <= 12;
   const first = store.name === firstStore.name;
+  const ratio = salesRatio(store);
   return {
-    radius: first ? 6 : recent ? 8 : 5,
+    radius: (first ? 5.5 : 4.5) + ratio * 5 + (recent ? 1.2 : 0),
     color: "#0b2414",
     weight: first || recent ? 2.6 : 1.4,
-    fillColor: first ? "#0f6b3d" : greenGradient(store),
-    fillOpacity: first || recent ? 1 : 0.9,
+    fillColor: salesGreen(store),
+    fillOpacity: 0.72 + ratio * 0.28,
     opacity: 0.95,
   };
 }
@@ -68,7 +89,7 @@ function markerStyle(store) {
 function tooltipLabel(store) {
   if (store.name === firstStore.name) return "석촌호수 1호점";
   const shortName = store.name.replace(/^우지커피\s*/, "");
-  return `${shortName} ${store.openOrderEstimate}호점`;
+  return `${shortName} ${store.openOrderEstimate}호점 · 평균매출 ${salesMetric(store).toLocaleString("ko-KR")}만원`;
 }
 
 function addMarker(layer, store) {
