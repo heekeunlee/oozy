@@ -1,0 +1,285 @@
+:root {
+  color-scheme: light;
+  --ink: #172018;
+  --muted: #667064;
+  --line: #dfe5dd;
+  --paper: #fbfaf6;
+  --panel: #ffffff;
+  --green: #0f6b3d;
+  --mint: #d9efe2;
+  --yellow: #f3c64f;
+  --red: #d5533c;
+  --shadow: 0 16px 36px rgba(24, 36, 26, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.app {
+  width: min(100%, 520px);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 18px 14px 32px;
+}
+
+.hero {
+  padding: 18px 4px 12px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+h1,
+h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+h1 {
+  font-size: 34px;
+  line-height: 1.08;
+}
+
+h2 {
+  font-size: 19px;
+  line-height: 1.25;
+}
+
+.lead {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 10px 0 12px;
+}
+
+.stats div,
+.panel,
+.map-shell {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.stats div {
+  padding: 12px 10px;
+}
+
+.stats span {
+  display: block;
+  font-size: 24px;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.stats small {
+  display: block;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.panel {
+  margin: 12px 0;
+  padding: 14px;
+}
+
+.control-head,
+.section-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+button,
+.source-chip {
+  border: 1px solid #b9cabb;
+  border-radius: 999px;
+  background: #f6fbf7;
+  color: var(--green);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+button {
+  min-width: 58px;
+  padding: 8px 12px;
+}
+
+.source-chip {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  font-size: 11px;
+}
+
+input[type="range"] {
+  width: 100%;
+  margin: 18px 0 12px;
+  accent-color: var(--green);
+}
+
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.timeline span {
+  text-align: center;
+}
+
+.map-shell {
+  position: sticky;
+  top: 8px;
+  z-index: 3;
+  overflow: hidden;
+  height: 58vh;
+  min-height: 420px;
+  max-height: 620px;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  background: #eaf3ec;
+}
+
+.first-marker {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--yellow);
+  color: #442f00;
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.24);
+}
+
+.growth-chart {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 44px 1fr 42px;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.bar-track {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #edf1eb;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--green), #42a86e);
+}
+
+.store-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.store-item {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fcfdfb;
+}
+
+.store-item strong {
+  font-size: 15px;
+}
+
+.store-item span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.rank {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.notes {
+  padding: 8px 2px 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.leaflet-popup-content {
+  margin: 10px 12px;
+  min-width: 180px;
+}
+
+.popup-title {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--ink);
+  font-weight: 850;
+}
+
+.popup-meta {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+@media (min-width: 760px) {
+  .app {
+    width: min(100%, 980px);
+    padding: 26px 20px 42px;
+  }
+
+  .hero {
+    width: 620px;
+  }
+
+  h1 {
+    font-size: 44px;
+  }
+
+  .map-shell {
+    height: 68vh;
+  }
+}

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>우지커피 전국 매장 분포</title>
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <section class="hero">
+        <p class="eyebrow">OOZY COFFEE MAP</p>
+        <h1>우지커피 전국 매장 분포</h1>
+        <p class="lead">공식 매장찾기 좌표 447개를 기반으로 1호점 권역부터 최근 등록 지점까지 모바일 화면에서 탐색할 수 있게 정리했습니다.</p>
+      </section>
+
+      <section class="stats" aria-label="요약">
+        <div>
+          <span id="visible-count">0</span>
+          <small>표시 매장</small>
+        </div>
+        <div>
+          <span id="current-total">447</span>
+          <small>현재 공식 목록</small>
+        </div>
+        <div>
+          <span id="region-count">0</span>
+          <small>시도 권역</small>
+        </div>
+      </section>
+
+      <section class="panel controls">
+        <div class="control-head">
+          <div>
+            <p class="eyebrow">PERIOD</p>
+            <h2><span id="year-label">2026</span>년까지 누적</h2>
+          </div>
+          <button id="play-button" type="button">재생</button>
+        </div>
+        <input id="year-range" type="range" min="2020" max="2026" step="1" value="2026">
+        <div id="timeline" class="timeline"></div>
+      </section>
+
+      <section class="map-shell">
+        <div id="map" aria-label="한국 지도 위 우지커피 매장 분포"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">GROWTH</p>
+            <h2>기간별 증가 수</h2>
+          </div>
+          <span class="source-chip">2026-04-28 기준</span>
+        </div>
+        <div id="growth-chart" class="growth-chart"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">STORES</p>
+            <h2>1호점 권역과 최근 등록 지점</h2>
+          </div>
+        </div>
+        <div id="store-list" class="store-list"></div>
+      </section>
+
+      <section class="notes">
+        <p>출처: 우지커피 공식 매장찾기, 우지커피 공식 브랜드/보도자료, 공정거래위원회 정보공개서 기반 공개 데이터.</p>
+        <p>매장별 정확한 개점일은 공개 목록에 포함되어 있지 않아 개별 지점의 연도는 공식 매장찾기 등록순을 연도별 공개 누적 수에 맞춰 배분한 추정값입니다.</p>
+      </section>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
