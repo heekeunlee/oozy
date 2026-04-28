@@ -19,15 +19,9 @@ const firstStore = {
   region: "서울",
 };
 
-const averageSalesByYear = {
-  2021: 21449,
-  2022: 22902,
-  2023: 23714,
-  2024: 21304,
-};
-
 const state = {
   stores: [],
+  sales: {},
   year: 2026,
   maps: {},
   layers: {},
@@ -51,21 +45,39 @@ function storesForYear(year) {
   return state.stores.filter((store) => store.openOrderEstimate <= target);
 }
 
-function salesMetric(store) {
-  if (store.name === firstStore.name) return averageSalesByYear[2021];
-  const disclosedYear = Math.min(Math.max(store.estimatedYear, 2021), 2024);
-  return averageSalesByYear[disclosedYear];
+function salesRecord(store) {
+  return state.sales[store.id] || state.sales[store.name] || null;
+}
+
+function salesAmount(store) {
+  const record = salesRecord(store);
+  if (!record) return null;
+  if (typeof record.monthlySales === "number") return record.monthlySales;
+  if (Array.isArray(record.months) && record.months.length) {
+    return record.months[record.months.length - 1].sales;
+  }
+  return null;
+}
+
+function availableSalesValues() {
+  return state.stores
+    .map((store) => salesAmount(store))
+    .filter((value) => typeof value === "number" && Number.isFinite(value));
 }
 
 function salesRatio(store) {
-  const values = Object.values(averageSalesByYear);
+  const value = salesAmount(store);
+  const values = availableSalesValues();
+  if (value === null || values.length < 2) return null;
   const min = Math.min(...values);
   const max = Math.max(...values);
-  return (salesMetric(store) - min) / (max - min);
+  if (max === min) return 0.5;
+  return (value - min) / (max - min);
 }
 
 function salesGreen(store) {
   const ratio = salesRatio(store);
+  if (ratio === null) return "#0f6b3d";
   const start = [181, 224, 193];
   const end = [2, 78, 39];
   const rgb = start.map((value, index) => Math.round(value + (end[index] - value) * ratio));
@@ -77,11 +89,11 @@ function markerStyle(store) {
   const first = store.name === firstStore.name;
   const ratio = salesRatio(store);
   return {
-    radius: (first ? 5.5 : 4.5) + ratio * 5 + (recent ? 1.2 : 0),
+    radius: ratio === null ? (first ? 6 : recent ? 7 : 5) : 4.5 + ratio * 7,
     color: "#0b2414",
     weight: first || recent ? 2.6 : 1.4,
     fillColor: salesGreen(store),
-    fillOpacity: 0.72 + ratio * 0.28,
+    fillOpacity: ratio === null ? 0.86 : 0.62 + ratio * 0.38,
     opacity: 0.95,
   };
 }
@@ -89,7 +101,9 @@ function markerStyle(store) {
 function tooltipLabel(store) {
   if (store.name === firstStore.name) return "석촌호수 1호점";
   const shortName = store.name.replace(/^우지커피\s*/, "");
-  return `${shortName} ${store.openOrderEstimate}호점 · 평균매출 ${salesMetric(store).toLocaleString("ko-KR")}만원`;
+  const sales = salesAmount(store);
+  const salesText = sales === null ? "매출 데이터 미연동" : `월매출 ${sales.toLocaleString("ko-KR")}만원`;
+  return `${shortName} ${store.openOrderEstimate}호점 · ${salesText}`;
 }
 
 function addMarker(layer, store) {
@@ -256,6 +270,15 @@ async function init() {
     ...store,
     estimatedYear: estimateYear(store.openOrderEstimate),
   }));
+
+  try {
+    const salesResponse = await fetch("data/sales.json", { cache: "no-store" });
+    if (salesResponse.ok) {
+      state.sales = await salesResponse.json();
+    }
+  } catch (error) {
+    state.sales = {};
+  }
 
   state.maps.all = createMap("map-all", [36.45, 127.85], 6.6);
   state.maps.gyeonggi = createMap("map-gyeonggi", [37.45, 127.18], 8.45);
