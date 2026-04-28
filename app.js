@@ -27,6 +27,13 @@ const state = {
   timer: null,
 };
 
+const highlightedStores = new Set([
+  firstStore.name,
+  "우지커피 광교상현역점",
+  "우지커피 수지상현점",
+  "우지커피 춘천주공랜드마크점",
+]);
+
 function milestoneForYear(year) {
   return milestones.find((item) => item.year === Number(year));
 }
@@ -108,6 +115,7 @@ function estimatedSales(store) {
 }
 
 function salesGreen(store) {
+  if (highlightedStores.has(store.name)) return "#f3c64f";
   const ratio = estimatedSales(store).ratio;
   const start = [181, 224, 193];
   const end = [2, 78, 39];
