@@ -21,7 +21,6 @@ const firstStore = {
 
 const state = {
   stores: [],
-  sales: {},
   year: 2026,
   maps: {},
   layers: {},
@@ -45,39 +44,57 @@ function storesForYear(year) {
   return state.stores.filter((store) => store.openOrderEstimate <= target);
 }
 
-function salesRecord(store) {
-  return state.sales[store.id] || state.sales[store.name] || null;
+function regionScore(store) {
+  const scores = {
+    서울: 1,
+    경기: 0.92,
+    인천: 0.86,
+    부산: 0.82,
+    세종: 0.78,
+    대전: 0.76,
+    대구: 0.74,
+    광주: 0.72,
+    울산: 0.7,
+    충남: 0.66,
+    충북: 0.64,
+    경남: 0.63,
+    경북: 0.6,
+    전북: 0.58,
+    전남: 0.56,
+    강원: 0.55,
+    제주: 0.54,
+  };
+  return scores[store.region] || 0.58;
 }
 
-function salesAmount(store) {
-  const record = salesRecord(store);
-  if (!record) return null;
-  if (typeof record.monthlySales === "number") return record.monthlySales;
-  if (Array.isArray(record.months) && record.months.length) {
-    return record.months[record.months.length - 1].sales;
-  }
-  return null;
+function locationScore(store) {
+  const text = `${store.name} ${store.address}`;
+  const keywords = [
+    "역", "대학", "대학교", "병원", "시장", "터미널", "공원", "로데오",
+    "센트럴", "시티", "타워", "몰", "스퀘어", "캠퍼스", "오피스", "비즈",
+  ];
+  const hits = keywords.filter((keyword) => text.includes(keyword)).length;
+  return Math.min(1, 0.48 + hits * 0.085);
 }
 
-function availableSalesValues() {
-  return state.stores
-    .map((store) => salesAmount(store))
-    .filter((value) => typeof value === "number" && Number.isFinite(value));
+function maturityScore(store) {
+  if (store.name === firstStore.name) return 0.86;
+  const years = Math.max(0, 2026 - store.estimatedYear);
+  return Math.min(1, 0.55 + years * 0.08);
 }
 
-function salesRatio(store) {
-  const value = salesAmount(store);
-  const values = availableSalesValues();
-  if (value === null || values.length < 2) return null;
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  if (max === min) return 0.5;
-  return (value - min) / (max - min);
+function estimatedSales(store) {
+  const score = 0.45 * regionScore(store) + 0.35 * locationScore(store) + 0.2 * maturityScore(store);
+  const monthlySales = Math.round(1500 + score * 3300);
+  return {
+    score: Math.round(score * 100),
+    monthlySales,
+    ratio: Math.max(0, Math.min(1, score)),
+  };
 }
 
 function salesGreen(store) {
-  const ratio = salesRatio(store);
-  if (ratio === null) return "#0f6b3d";
+  const ratio = estimatedSales(store).ratio;
   const start = [181, 224, 193];
   const end = [2, 78, 39];
   const rgb = start.map((value, index) => Math.round(value + (end[index] - value) * ratio));
@@ -87,23 +104,24 @@ function salesGreen(store) {
 function markerStyle(store) {
   const recent = store.newestRank <= 12;
   const first = store.name === firstStore.name;
-  const ratio = salesRatio(store);
+  const ratio = estimatedSales(store).ratio;
   return {
-    radius: ratio === null ? (first ? 6 : recent ? 7 : 5) : 4.5 + ratio * 7,
+    radius: (first ? 5.5 : 4.5) + ratio * 7 + (recent ? 0.7 : 0),
     color: "#0b2414",
     weight: first || recent ? 2.6 : 1.4,
     fillColor: salesGreen(store),
-    fillOpacity: ratio === null ? 0.86 : 0.62 + ratio * 0.38,
+    fillOpacity: 0.62 + ratio * 0.38,
     opacity: 0.95,
   };
 }
 
 function tooltipLabel(store) {
-  if (store.name === firstStore.name) return "석촌호수 1호점";
+  const estimate = estimatedSales(store);
+  if (store.name === firstStore.name) {
+    return `석촌호수 1호점 · 추정 월매출 ${estimate.monthlySales.toLocaleString("ko-KR")}만원`;
+  }
   const shortName = store.name.replace(/^우지커피\s*/, "");
-  const sales = salesAmount(store);
-  const salesText = sales === null ? "매출 데이터 미연동" : `월매출 ${sales.toLocaleString("ko-KR")}만원`;
-  return `${shortName} ${store.openOrderEstimate}호점 · ${salesText}`;
+  return `${shortName} ${store.openOrderEstimate}호점 · 추정 월매출 ${estimate.monthlySales.toLocaleString("ko-KR")}만원 · 점수 ${estimate.score}`;
 }
 
 function addMarker(layer, store) {
@@ -270,15 +288,6 @@ async function init() {
     ...store,
     estimatedYear: estimateYear(store.openOrderEstimate),
   }));
-
-  try {
-    const salesResponse = await fetch("data/sales.json", { cache: "no-store" });
-    if (salesResponse.ok) {
-      state.sales = await salesResponse.json();
-    }
-  } catch (error) {
-    state.sales = {};
-  }
 
   state.maps.all = createMap("map-all", [36.45, 127.85], 6.6);
   state.maps.gyeonggi = createMap("map-gyeonggi", [37.45, 127.18], 8.45);
