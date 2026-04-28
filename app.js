@@ -85,7 +85,7 @@ function maturityScore(store) {
 
 function estimatedSales(store) {
   const score = 0.45 * regionScore(store) + 0.35 * locationScore(store) + 0.2 * maturityScore(store);
-  const monthlySales = Math.round(1500 + score * 3300);
+  const monthlySales = Math.round((1500 + score * 3300) * 0.75);
   return {
     score: Math.round(score * 100),
     monthlySales,
