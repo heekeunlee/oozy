@@ -39,10 +39,6 @@
           </div>
           <button id="play-button" type="button">재생</button>
         </div>
-        <div class="view-toggle" aria-label="지도 보기 범위">
-          <button class="active" type="button" data-view="all">남한 전체</button>
-          <button type="button" data-view="gyeonggi">경기도</button>
-        </div>
         <input id="year-range" type="range" min="2019" max="2026" step="1" value="2026">
         <div id="timeline" class="timeline"></div>
         <div class="gradient-legend" aria-label="매장 순번 색상 범례">
@@ -52,8 +48,27 @@
         </div>
       </section>
 
-      <section class="map-shell">
-        <div id="map" aria-label="한국 지도 위 우지커피 매장 분포"></div>
+      <section class="map-stack" aria-label="우지커피 매장 지도">
+        <article class="map-card">
+          <div class="map-title">
+            <div>
+              <p class="eyebrow">KOREA</p>
+              <h2>남한 전체 분포</h2>
+            </div>
+            <span><b id="all-visible-count">0</b>개</span>
+          </div>
+          <div id="map-all" class="map" aria-label="남한 전체 우지커피 매장 분포"></div>
+        </article>
+        <article class="map-card">
+          <div class="map-title">
+            <div>
+              <p class="eyebrow">GYEONGGI</p>
+              <h2>경기도 분포</h2>
+            </div>
+            <span><b id="gyeonggi-visible-count">0</b>개</span>
+          </div>
+          <div id="map-gyeonggi" class="map" aria-label="경기도 우지커피 매장 분포"></div>
+        </article>
       </section>
 
       <section class="panel">

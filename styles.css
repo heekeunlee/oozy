@@ -74,7 +74,7 @@ h2 {
 
 .stats div,
 .panel,
-.map-shell {
+.map-card {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
@@ -128,31 +128,6 @@ button {
   padding: 8px 12px;
 }
 
-.view-toggle {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  margin-top: 14px;
-  padding: 4px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #f0f4ef;
-}
-
-.view-toggle button {
-  min-width: 0;
-  border-color: transparent;
-  border-radius: 6px;
-  background: transparent;
-  color: #58635b;
-}
-
-.view-toggle button.active {
-  background: var(--green);
-  color: #fff;
-  box-shadow: 0 6px 14px rgba(15, 107, 61, 0.22);
-}
-
 .source-chip {
   flex: 0 0 auto;
   padding: 7px 10px;
@@ -195,19 +170,43 @@ input[type="range"] {
   background: linear-gradient(90deg, #d2eedb, #75bc8b, #05562c);
 }
 
-.map-shell {
-  position: sticky;
-  top: 8px;
-  z-index: 3;
-  overflow: hidden;
-  height: 58vh;
-  min-height: 420px;
-  max-height: 620px;
+.map-stack {
+  display: grid;
+  gap: 12px;
 }
 
-#map {
+.map-card {
+  overflow: hidden;
+}
+
+.map-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 14px 11px;
+  border-bottom: 1px solid var(--line);
+}
+
+.map-title span {
+  flex: 0 0 auto;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.map-title b {
+  font-size: 18px;
+}
+
+.map {
+  height: 48vh;
+  min-height: 360px;
+  max-height: 520px;
+}
+
+.map {
   width: 100%;
-  height: 100%;
   background: #f3f3f1;
 }
 
@@ -218,20 +217,6 @@ input[type="range"] {
 .leaflet-overlay-pane svg path {
   paint-order: stroke fill;
   filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.28));
-}
-
-.first-marker {
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border: 3px solid #102416;
-  border-radius: 50%;
-  background: var(--green);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 900;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28), 0 0 0 3px #fff;
 }
 
 .growth-chart {
@@ -347,7 +332,11 @@ input[type="range"] {
     font-size: 44px;
   }
 
-  .map-shell {
-    height: 68vh;
+  .map-stack {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .map {
+    height: 58vh;
   }
 }
