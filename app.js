@@ -128,7 +128,7 @@ function markerStyle(store) {
   const first = store.name === firstStore.name;
   const ratio = estimatedSales(store).ratio;
   return {
-    radius: (first ? 5.5 : 4.5) + ratio * 7 + (recent ? 0.7 : 0),
+    radius: (first ? 4 : 3.2) + ratio * 4.2 + (recent ? 0.4 : 0),
     color: "#0b2414",
     weight: first || recent ? 2.6 : 1.4,
     fillColor: salesGreen(store),
@@ -158,7 +158,7 @@ function addMarker(layer, store) {
 
   marker.on("mouseover", () => {
     marker.setStyle({
-      radius: (markerStyle(store).radius || 5) + 3,
+      radius: (markerStyle(store).radius || 4) + 1.8,
       fillOpacity: 1,
       weight: 3,
     });
@@ -189,6 +189,7 @@ function renderMaps() {
   document.querySelector("#gyeonggi-visible-count").textContent = gyeonggiVisible.length.toLocaleString("ko-KR");
   document.querySelector("#year-label").textContent = state.year;
   renderStoreList(allVisible, gyeonggiVisible);
+  renderSalesRanking(allVisible);
 }
 
 function renderTimeline() {
@@ -252,6 +253,29 @@ function renderStoreList(allVisible, gyeonggiVisible) {
     `)
     .join("");
   list.innerHTML = firstArea + current + gyeonggi + latest;
+}
+
+function renderSalesRanking(stores) {
+  const ranking = document.querySelector("#sales-ranking");
+  const rankedStores = [...stores]
+    .sort((a, b) => {
+      const salesDiff = estimatedSales(b).monthlySales - estimatedSales(a).monthlySales;
+      return salesDiff || a.openOrderEstimate - b.openOrderEstimate;
+    });
+
+  ranking.innerHTML = rankedStores.map((store, index) => {
+    const estimate = estimatedSales(store);
+    return `
+      <article class="ranking-item">
+        <strong>${index + 1}</strong>
+        <div>
+          <b>${store.name}</b>
+          <span>${store.region} · ${store.openOrderEstimate}호점 · 점수 ${estimate.score}</span>
+        </div>
+        <em>${estimate.monthlySales.toLocaleString("ko-KR")}만원</em>
+      </article>
+    `;
+  }).join("");
 }
 
 function initControls() {

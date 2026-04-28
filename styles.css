@@ -285,6 +285,58 @@ input[type="range"] {
   font-weight: 800;
 }
 
+.ranking-list {
+  display: grid;
+  gap: 6px;
+  max-height: 520px;
+  margin-top: 14px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.ranking-item {
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fcfdfb;
+}
+
+.ranking-item strong {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--mint);
+  color: var(--green);
+  font-size: 12px;
+}
+
+.ranking-item b {
+  display: block;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.ranking-item span {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.ranking-item em {
+  color: #102416;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
 .notes {
   padding: 8px 2px 0;
   color: var(--muted);
