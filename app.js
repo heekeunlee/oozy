@@ -83,7 +83,7 @@ function maturityScore(store) {
   return Math.min(1, 0.55 + years * 0.08);
 }
 
-function estimatedSales(store) {
+function baseEstimatedSales(store) {
   const score = 0.45 * regionScore(store) + 0.35 * locationScore(store) + 0.2 * maturityScore(store);
   const monthlySales = Math.round((1500 + score * 3300) * 0.75);
   return {
@@ -91,6 +91,20 @@ function estimatedSales(store) {
     monthlySales,
     ratio: Math.max(0, Math.min(1, score)),
   };
+}
+
+function estimatedSales(store) {
+  const estimate = baseEstimatedSales(store);
+  if (store.name === "우지커피 광교상현역점") {
+    const sujiStore = state.stores.find((item) => item.name === "우지커피 수지상현점");
+    const sujiEstimate = sujiStore ? baseEstimatedSales(sujiStore) : estimate;
+    return {
+      score: Math.round(sujiEstimate.score * 0.9),
+      monthlySales: Math.round(sujiEstimate.monthlySales * 0.9),
+      ratio: Math.max(0, Math.min(1, sujiEstimate.ratio * 0.9)),
+    };
+  }
+  return estimate;
 }
 
 function salesGreen(store) {
